@@ -43,11 +43,12 @@
     .help{font-size:.85rem;color:var(--muted)}
     .tag{display:inline-block;background:#0b1220;border:1px solid var(--border);border-radius:8px;padding:4px 8px;margin-right:6px}
     .mini-table{overflow:auto;border:1px solid var(--border);border-radius:10px; -webkit-overflow-scrolling: touch}
-    .mini-table table{table-layout:fixed; width:520px; min-width:520px}
+    .mini-table table{table-layout:fixed; width:640px; min-width:640px}
     .mini-table th:nth-child(1), .mini-table td:nth-child(1){width:40px;text-align:center}
     .mini-table th:nth-child(2), .mini-table td:nth-child(2){width:140px;text-align:center}
-    .mini-table th:nth-child(3), .mini-table td:nth-child(3){width:260px}
-    .mini-table th:nth-child(4), .mini-table td:nth-child(4){width:60px;text-align:center}
+    .mini-table th:nth-child(3), .mini-table td:nth-child(3){width:160px}
+    .mini-table th:nth-child(4), .mini-table td:nth-child(4){width:140px;text-align:center}
+    .mini-table th:nth-child(5), .mini-table td:nth-child(5){width:60px;text-align:center}
     .subhead{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);margin:6px 0 2px}
     #curveWrap{border:1px solid var(--border);border-radius:10px;padding:8px;margin-top:6px; position:relative}
     canvas{display:block;width:100%;height:160px}
@@ -89,28 +90,27 @@
       <div class="row">
         <div>
           <label>Monto del préstamo (CRC)</label>
-          <input id="principal" type="number" inputmode="decimal" step="0.01" min="0" value="20831506.63" autocomplete="off">
+          <input id="principal" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off">
         </div>
         <div>
-          <label>Cuota inicial sugerida (opcional)</label>
-          <input id="monthlyPayment" type="number" inputmode="decimal" step="0.01" min="0" value="148038.20" autocomplete="off">
-          <div class="help">La cuota real se calcula al inicio; luego solo se ajusta por cambios de tasa, preservando los meses ganados con aportes.</div>
+          <label>Cuota mensual (requerida)</label>
+          <input id="monthlyPayment" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off">
         </div>
       </div>
       <div class="row">
         <div>
           <label>Fecha de inicio</label>
-          <input id="startDate" type="date" value="2023-03-07" inputmode="numeric" placeholder="AAAA-MM-DD" autocomplete="off">
+          <input id="startDate" type="date" inputmode="numeric" placeholder="AAAA-MM-DD" autocomplete="off">
         </div>
         <div>
           <label>Plazo original (meses)</label>
-          <input id="origTerm" type="number" value="360" min="1" step="1" inputmode="numeric" autocomplete="off">
+          <input id="origTerm" type="number" min="1" step="1" inputmode="numeric" autocomplete="off">
         </div>
       </div>
 
       <div class="hr"></div>
       <h3>Tasas por periodo</h3>
-      <div class="note">Periodo 1: 7.55% hasta +36m. Periodo 2: 8.4% hasta el final. (Editable)</div>
+      <div class="note">Agregue al menos un periodo de tasa (inicio, fin opcional, tasa anual).</div>
       <div id="rates"></div>
       <div class="flex">
         <button id="addRate" class="btn btn-secondary btn-pill">+ Agregar periodo</button>
@@ -121,11 +121,11 @@
       <div class="row">
         <div>
           <label>Porcentaje (%)</label>
-          <input id="penaltyPct" type="number" inputmode="decimal" step="0.01" min="0" value="3" autocomplete="off">
+          <input id="penaltyPct" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off">
         </div>
         <div>
           <label>Vigencia (meses desde inicio)</label>
-          <input id="penaltyMonths" type="number" step="1" min="0" value="36" inputmode="numeric" autocomplete="off">
+          <input id="penaltyMonths" type="number" step="1" min="0" inputmode="numeric" autocomplete="off">
         </div>
       </div>
 
@@ -135,14 +135,21 @@
 
       <h4>Puntuales</h4>
       <div id="extrasList"></div>
-      <div class="row3">
+      <div class="row4">
         <div><label>Fecha</label><input id="exDate" type="date" inputmode="numeric" placeholder="AAAA-MM-DD"></div>
-        <div><label>Monto (CRC)</label><input id="exAmount" type="number" inputmode="numeric" step="10000" min="0" value="0"></div>
+        <div><label>Monto (CRC)</label><input id="exAmount" type="number" inputmode="numeric" step="10000" min="0"></div>
+        <div>
+          <label>Aplicar a</label>
+          <select id="exEffect">
+            <option value="plazo" selected>Reducir plazo</option>
+            <option value="cuota">Reducir cuota</option>
+          </select>
+        </div>
         <div><label>&nbsp;</label><button id="addExtra" class="btn btn-secondary btn-pill">+ Agregar</button></div>
       </div>
 
       <h4>Mensuales desde fecha</h4>
-      <div class="row3">
+      <div class="row4">
         <div><label>Activar</label>
           <select id="recurOn">
             <option value="no" selected>No</option>
@@ -150,7 +157,14 @@
           </select>
         </div>
         <div><label>Desde</label><input id="recurStart" type="date" inputmode="numeric" placeholder="AAAA-MM-DD"></div>
-        <div><label>Monto mensual (CRC)</label><input id="recurAmount" type="number" inputmode="numeric" step="10000" min="0" value="0"></div>
+        <div><label>Monto mensual (CRC)</label><input id="recurAmount" type="number" inputmode="numeric" step="10000" min="0"></div>
+        <div>
+          <label>Aplicar a</label>
+          <select id="recurEffect">
+            <option value="plazo" selected>Reducir plazo</option>
+            <option value="cuota">Reducir cuota</option>
+          </select>
+        </div>
       </div>
       <div class="row">
         <div>
@@ -309,7 +323,7 @@
     var monthsFromStart = (due.getFullYear()-start.getFullYear())*12 + (due.getMonth()-start.getMonth());
     if (recurCfg.months && monthsFromStart >= recurCfg.months) return null;
     var d = new Date(due.getTime()-1); // al final del mes
-    return {date: d, amount: Number(recurCfg.amount)};
+    return {date: d, amount: Number(recurCfg.amount), mode: (recurCfg.mode||'plazo')};
   }
   function extrasInMonth(prev, due, extraEvents, recurCfg){
     var list=[];
@@ -318,7 +332,7 @@
       var ev = extraEvents[i]; if (!ev) continue;
       var d = (ev.date instanceof Date)? ev.date : fromISO(ev.date);
       var a = Number(ev.amount)||0;
-      if (a>0 && d>=prev && d<=due) list.push({date:d, amount:a});
+      if (a>0 && d>=prev && d<=due) list.push({date:d, amount:a, mode:(ev.mode||'plazo')});
     }
     // Recurrente mensual
     var m = monthlies(prev,due,recurCfg);
@@ -406,10 +420,20 @@
         bal = Math.max(0, bal - net);
         extraThis += gross;
 
-        // Recalcular meses "efectivos" tras el aporte (para reducir plazo)
-        var N_eff_now = effectiveRemainingMonths(bal, rMonthly, currentPayment);
-        targetRemaining = Math.min(targetRemaining, N_eff_now);
-        if (targetRemaining < 1) targetRemaining = 1;
+        // Ajustar segn efecto seleccionado: plazo o cuota
+        var mode = ev.mode || 'plazo';
+        if (mode === 'plazo'){
+          // Recalcular meses "efectivos" tras el aporte (reducir plazo)
+          var N_eff_now = effectiveRemainingMonths(bal, rMonthly, currentPayment);
+          targetRemaining = Math.min(targetRemaining, N_eff_now);
+          if (targetRemaining < 1) targetRemaining = 1;
+        } else {
+          // Reducir cuota: recalcular cuota manteniendo los meses objetivo
+          var N_for_payment = Math.max(1, Math.round(targetRemaining));
+          currentPayment = (rMonthly>0)
+            ? bal * (rMonthly*Math.pow(1+rMonthly, N_for_payment)) / (Math.pow(1+rMonthly, N_for_payment)-1)
+            : (N_for_payment>0? bal / N_for_payment : bal);
+        }
       }
 
       // tramo restante del mes
@@ -466,6 +490,7 @@
   }
 
   // ---------- UI ----------
+  var allowCalc = false;
   function $(sel){ return document.querySelector(sel); }
   function fmtCRC(n){ try{ return new Intl.NumberFormat('es-CR',{style:'currency',currency:'CRC'}).format(n);}catch(e){ return '₡'+(Math.round(n).toString()); } }
 
@@ -473,12 +498,13 @@
   var ratesBox;
   function rateRowTemplate(obj, i){
     var start=obj.start, end=obj.end, annual=obj.annual;
+    var rateStr = (typeof annual === 'number' && isFinite(annual)) ? (annual*100).toFixed(4) : '';
     var delBtn = (i===0) ? '<div></div>' : '<div><label>&nbsp;</label><button class="btn btn-danger btn-xs" data-del="'+i+'">✕</button></div>';
     var html = '';
     html += '<div class="row4" data-row="'+i+'">';
     html +=   '<div><label>Inicio</label><input type="date" class="r-start" value="'+start+'"></div>';
     html +=   '<div><label>Fin</label><input type="date" class="r-end" value="'+(end||'')+'"></div>';
-    html +=   '<div><label>Tasa anual (%)</label><input type="number" class="r-rate" step="0.0001" min="0" max="100" value="'+(annual*100).toFixed(4)+'"></div>';
+    html +=   '<div><label>Tasa anual (%)</label><input type="number" class="r-rate" step="0.0001" min="0" max="100" value="'+rateStr+'"></div>';
     html +=   delBtn;
     html += '</div>';
     return html;
@@ -547,18 +573,20 @@
   // Lectura de inputs
   function readInputs(){
     var principal = Number(document.querySelector('#principal').value);
+    var cuota = Number(document.querySelector('#monthlyPayment').value);
     var sd = document.querySelector('#startDate').value;
     if (!sd || !/^\d{4}-\d{2}-\d{2}$/.test(sd)){ throw new Error('Fecha de inicio inválida. Use AAAA-MM-DD.'); }
     var startDate = fromISO(sd);
-    var origTerm = Number(document.querySelector('#origTerm').value) || 360;
+    var origTerm = Number(document.querySelector('#origTerm').value);
     var penaltyPct = Number(document.querySelector('#penaltyPct').value)/100;
     var penaltyMonths = Number(document.querySelector('#penaltyMonths').value)||0;
     var recurOn = document.querySelector('#recurOn').value==='si';
     var recurStartStr = document.querySelector('#recurStart').value;
     var recurAmount = Number(document.querySelector('#recurAmount').value)||0;
+    var recurEffect = (document.querySelector('#recurEffect') && document.querySelector('#recurEffect').value) || 'plazo';
     var recurMonths = Number(document.querySelector('#recurMonths').value)||null;
     var ratePeriods = readRates();
-    var recur = (recurOn && recurAmount>0 && recurStartStr) ? {on:true, amount:recurAmount, start:recurStartStr, months:recurMonths} : null;
+    var recur = (recurOn && recurAmount>0 && recurStartStr) ? {on:true, amount:recurAmount, start:recurStartStr, months:recurMonths, mode:recurEffect} : null;
 
     if (!(principal>0)) throw new Error('El monto del préstamo debe ser mayor que cero.');
 
@@ -774,6 +802,7 @@
 
   // --------- Cálculo + render ---------
   function calculateAndRender(){
+    if (!allowCalc) { return; }
     var inp = readInputs();
 
     // Base (sin aportes)
@@ -808,14 +837,14 @@
     ratesBox = ratesBoxEl;
     extrasList = document.getElementById('extrasList');
 
-    // defaults
-    rateRows = initDefaultRates();
+    // defaults (sin valores por defecto)
+    rateRows = [];
     renderRates();
 
     // bind events
     document.getElementById('addRate').addEventListener('click', function(e){
       e.preventDefault();
-      rateRows.push({start: (document.getElementById('startDate').value||'2023-03-07'), end: null, annual:0.08});
+      rateRows.push({start: (document.getElementById('startDate').value||''), end: null, annual:null});
       renderRates();
     });
 
@@ -828,15 +857,15 @@
     });
 
     document.getElementById('startDate').addEventListener('change', function(){
-      rateRows = initDefaultRates(); renderRates();
       ensureDateInputs();
     });
 
     document.getElementById('addExtra').addEventListener('click', function(){
       var d = document.getElementById('exDate').value;
       var a = Number(document.getElementById('exAmount').value);
+      var eff = (document.getElementById('exEffect') && document.getElementById('exEffect').value) || 'plazo';
       if (!d || !(a>0)) { alert('Complete fecha y monto > 0'); return; }
-      extras.push({date:d, amount:a}); renderExtras();
+      extras.push({date:d, amount:a, mode: eff}); renderExtras();
     });
     extrasList.addEventListener('click', function(e){
       var idx = e.target && e.target.getAttribute('data-del');
@@ -857,7 +886,7 @@
 
     document.getElementById('calc').addEventListener('click', function(e){
       e.preventDefault();
-      try{ calculateAndRender(); }catch(err){ document.getElementById('msg').textContent = err.message || String(err); }
+      try{ allowCalc = true; calculateAndRender(); }catch(err){ document.getElementById('msg').textContent = err.message || String(err); }
     });
 
     document.getElementById('exportCsv').addEventListener('click', function(){
