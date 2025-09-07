@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Calculadora Hipotecaria CRC — v4.1 (M/VEN)</title>
+  <title>Calculadora Hipotecaria CRC y aportes</title>
   <style>
     :root{--bg:#0f172a;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--accent:#22c55e;--accent-2:#06b6d4;--danger:#ef4444;--warning:#f59e0b;--border:#1f2937;--gray:#9ca3af}
     *{box-sizing:border-box; -webkit-tap-highlight-color: transparent}
@@ -81,8 +81,8 @@
 <body>
   <div class="wrap grid">
     <header class="card span-12">
-      <h1>Calculadora Hipotecaria CRC — M/VEN</h1>
-      <div class="note">Interés <b>mensual vencido</b> (anual/12). Penalidad de prepago se <b>descuenta del aporte</b> (no reduce saldo). Con aportes, el <b>plazo se reduce</b>; en cambios de tasa, la cuota se recalcula preservando meses ahorrados.</div>
+      <h1>Calculadora Hipotecaria CRC — Aportes</h1>
+      <div class="note">Interés <b>mensual vencido M/VEN</b> (anual/12). Penalidad de prepago se <b>descuenta del aporte</b> (no reduce saldo). Con aportes, el <b>plazo se reduce</b>; en cambios de tasa, la cuota se recalcula preservando meses ahorrados.</div>
     </header>
 
     <section class="card span-7 grid">
@@ -90,7 +90,7 @@
       <div class="row">
         <div>
           <label>Monto del préstamo (CRC)</label>
-          <input id="principal" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off">
+          <input id="principal" type="number" inputmode="decimal" step="100000" min="0" autocomplete="off">
         </div>
         <div>
           <label>Cuota inicial (calculada)</label>
@@ -117,11 +117,11 @@
       </div>
 
       <div class="hr"></div>
-      <h3>Penalización por prepago</h3>
+      <h3>Penalización sobre aportes extraordinarios</h3>
       <div class="row">
         <div>
           <label>Porcentaje (%)</label>
-          <input id="penaltyPct" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off">
+          <input id="penaltyPct" type="number" inputmode="decimal" step="0.1" min="0" autocomplete="off">
         </div>
         <div>
           <label>Vigencia (meses desde inicio)</label>
@@ -131,7 +131,7 @@
 
       <div class="hr"></div>
       <h3>Aportes extraordinarios</h3>
-      <div class="note">Podés combinar <span class="tag">puntuales</span> y <span class="tag">mensuales desde fecha</span>.</div>
+      <div class="note">Podés combinar <span class="tag">puntuales</span> y <span class="tag">mensuales desde fecha</span></div>
 
       <h4>Puntuales</h4>
       <div id="extrasList"></div>
@@ -577,6 +577,7 @@
     if (!sd || !/^\d{4}-\d{2}-\d{2}$/.test(sd)){ throw new Error('Fecha de inicio inválida. Use AAAA-MM-DD.'); }
     var startDate = fromISO(sd);
     var origTerm = Number(document.querySelector('#origTerm').value);
+    if (!(origTerm>0)){ throw new Error('Plazo original inválido.'); }
     var penaltyPct = Number(document.querySelector('#penaltyPct').value)/100;
     var penaltyMonths = Number(document.querySelector('#penaltyMonths').value)||0;
     var recurOn = document.querySelector('#recurOn').value==='si';
