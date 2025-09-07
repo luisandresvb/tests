@@ -844,6 +844,8 @@
     // bind events
     document.getElementById('addRate').addEventListener('click', function(e){
       e.preventDefault();
+      // preserva valores actuales antes de agregar una fila nueva
+      rateRows = readRates();
       rateRows.push({start: (document.getElementById('startDate').value||''), end: null, annual:null});
       renderRates();
     });
@@ -851,6 +853,8 @@
     ratesBox.addEventListener('click', function(e){
       var del = e.target && e.target.getAttribute('data-del');
       if (del!==null && del!==undefined){
+        // sincroniza valores editados antes de eliminar
+        rateRows = readRates();
         var idx = Number(del);
         if (idx>0){ rateRows.splice(idx,1); renderRates(); }
       }
