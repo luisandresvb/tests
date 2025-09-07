@@ -93,8 +93,8 @@
           <input id="principal" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off">
         </div>
         <div>
-          <label>Cuota mensual (requerida)</label>
-          <input id="monthlyPayment" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off">
+          <label>Cuota inicial (calculada)</label>
+          <input id="monthlyPayment" type="number" inputmode="decimal" step="0.01" min="0" autocomplete="off" readonly>
         </div>
       </div>
       <div class="row">
@@ -497,7 +497,7 @@
   // Tasas UI
   var ratesBox;
   function rateRowTemplate(obj, i){
-    var start=obj.start, end=obj.end, annual=obj.annual;
+    var start=obj.start, end=obj.end, annual=obj.annual_rate;
     var rateStr = (typeof annual === 'number' && isFinite(annual)) ? (annual*100).toFixed(4) : '';
     var delBtn = (i===0) ? '<div></div>' : '<div><label>&nbsp;</label><button class="btn btn-danger btn-xs" data-del="'+i+'">✕</button></div>';
     var html = '';
@@ -515,8 +515,8 @@
     var s = fromISO(startDate);
     var end1 = toISO(addMonths(s,36));
     return [
-      {start: startDate, end: end1, annual: 0.0755},
-      {start: end1, end: null, annual: 0.0840}
+      {start: startDate, end: end1, annual_rate: 0.0755},
+      {start: end1, end: null, annual_rate: 0.0840}
     ];
   }
   var rateRows;
@@ -573,7 +573,6 @@
   // Lectura de inputs
   function readInputs(){
     var principal = Number(document.querySelector('#principal').value);
-    var cuota = Number(document.querySelector('#monthlyPayment').value);
     var sd = document.querySelector('#startDate').value;
     if (!sd || !/^\d{4}-\d{2}-\d{2}$/.test(sd)){ throw new Error('Fecha de inicio inválida. Use AAAA-MM-DD.'); }
     var startDate = fromISO(sd);
@@ -804,6 +803,14 @@
   function calculateAndRender(){
     if (!allowCalc) { return; }
     var inp = readInputs();
+    // calcular cuota inicial y mostrarla
+    if (inp.ratePeriods.length && inp.origTerm > 0){
+      var r0 = rateAt(inp.startDate, inp.ratePeriods)/12;
+      var cuotaIni = (r0>0)
+        ? inp.principal * (r0*Math.pow(1+r0, inp.origTerm)) / (Math.pow(1+r0, inp.origTerm)-1)
+        : inp.principal / inp.origTerm;
+      document.getElementById('monthlyPayment').value = round2(cuotaIni).toFixed(2);
+    }
 
     // Base (sin aportes)
     var base = amortizationSchedule({
@@ -842,13 +849,18 @@
     renderRates();
 
     // bind events
-    document.getElementById('addRate').addEventListener('click', function(e){
-      e.preventDefault();
-      // preserva valores actuales antes de agregar una fila nueva
-      rateRows = readRates();
-      rateRows.push({start: (document.getElementById('startDate').value||''), end: null, annual:null});
-      renderRates();
-    });
+      document.getElementById('addRate').addEventListener('click', function(e){
+        e.preventDefault();
+        // preserva valores actuales antes de agregar una fila nueva
+        rateRows = readRates();
+        var defaultStart = document.getElementById('startDate').value || '';
+        if (rateRows.length > 0){
+          var prev = rateRows[rateRows.length-1];
+          defaultStart = prev.end || prev.start || defaultStart;
+        }
+        rateRows.push({start: defaultStart, end: null, annual_rate:null});
+        renderRates();
+      });
 
     ratesBox.addEventListener('click', function(e){
       var del = e.target && e.target.getAttribute('data-del');
