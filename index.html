@@ -332,7 +332,7 @@
       var ev = extraEvents[i]; if (!ev) continue;
       var d = (ev.date instanceof Date)? ev.date : fromISO(ev.date);
       var a = Number(ev.amount)||0;
-      if (a>0 && d>=prev && d<=due) list.push({date:d, amount:a, mode:(ev.mode||'plazo')});
+      if (a>0 && d>prev && d<=due) list.push({date:d, amount:a, mode:(ev.mode||'plazo')});
     }
     // Recurrente mensual
     var m = monthlies(prev,due,recurCfg);
