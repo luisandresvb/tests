@@ -81,7 +81,7 @@
 <body>
   <div class="wrap grid">
     <header class="card span-12">
-      <h1>Calculadora Hipotecaria CRC — Aportes</h1>
+      <h1>Calculadora Hipotecaria — Aportes extra.</h1>
       <div class="note">Interés <b>mensual vencido M/VEN</b> (anual/12). Penalidad de prepago se <b>descuenta del aporte</b> (no reduce saldo). Con aportes, el <b>plazo se reduce</b>; en cambios de tasa, la cuota se recalcula preservando meses ahorrados.</div>
     </header>
 
@@ -89,7 +89,7 @@
       <h2>Parámetros</h2>
       <div class="row">
         <div>
-          <label>Monto del préstamo (CRC)</label>
+          <label>Monto del préstamo</label>
           <input id="principal" type="number" inputmode="decimal" step="100000" min="0" autocomplete="off">
         </div>
         <div>
@@ -110,7 +110,7 @@
 
       <div class="hr"></div>
       <h3>Tasas por periodo</h3>
-      <div class="note">Agregue al menos un periodo de tasa (inicio, fin opcional, tasa anual).</div>
+      <div class="note">Agregue al menos un periodo de tasa (inicio, tasa anual y fin opcional (vacío= hasta final de plazo</div>
       <div id="rates"></div>
       <div class="flex">
         <button id="addRate" class="btn btn-secondary btn-pill">+ Agregar periodo</button>
@@ -137,7 +137,7 @@
       <div id="extrasList"></div>
       <div class="row4">
         <div><label>Fecha</label><input id="exDate" type="date" inputmode="numeric" placeholder="AAAA-MM-DD"></div>
-        <div><label>Monto (CRC)</label><input id="exAmount" type="number" inputmode="numeric" step="10000" min="0"></div>
+        <div><label>Monto</label><input id="exAmount" type="number" inputmode="numeric" step="10000" min="0"></div>
         <div>
           <label>Aplicar a</label>
           <select id="exEffect">
@@ -157,7 +157,7 @@
           </select>
         </div>
         <div><label>Desde</label><input id="recurStart" type="date" inputmode="numeric" placeholder="AAAA-MM-DD"></div>
-        <div><label>Monto mensual (CRC)</label><input id="recurAmount" type="number" inputmode="numeric" step="10000" min="0"></div>
+        <div><label>Monto mensual</label><input id="recurAmount" type="number" inputmode="numeric" step="10000" min="0"></div>
         <div>
           <label>Aplicar a</label>
           <select id="recurEffect">
