@@ -507,8 +507,26 @@
       var start=row.querySelector('.r-start').value;
       var end=row.querySelector('.r-end').value;
       var rate=Number(row.querySelector('.r-rate').value)/100;
-      if (!start || !isFinite(rate)) continue;
+      if (!start || !/^\d{4}-\d{2}-\d{2}$/.test(start)){
+        throw new Error('Fecha de inicio inválida en periodo '+(i+1));
+      }
+      if (end && !/^\d{4}-\d{2}-\d{2}$/.test(end)){
+        throw new Error('Fecha fin inválida en periodo '+(i+1));
+      }
+      if (!(rate>0 && rate<=1)){
+        throw new Error('Tasa anual (%) inválida en periodo '+(i+1));
+      }
+      if (end && fromISO(end) <= fromISO(start)){
+        throw new Error('La fecha fin debe ser posterior a la inicial en periodo '+(i+1));
+      }
       out.push({start:start, end:end||null, annual_rate: rate});
+    }
+    var sorted = out.slice().sort(function(a,b){ return fromISO(a.start) - fromISO(b.start); });
+    for (var j=1;j<sorted.length;j++){
+      var prev = sorted[j-1], curr = sorted[j];
+      if (!prev.end || fromISO(prev.end) > fromISO(curr.start)){
+        throw new Error('Los periodos de tasas no deben traslaparse');
+      }
     }
     return out;
   }
@@ -815,13 +833,34 @@
     // bind events
     document.getElementById('addRate').addEventListener('click', function(e){
       e.preventDefault();
-      rateRows.push({start: (document.getElementById('startDate').value||'2023-03-07'), end: null, annual:0.08});
+      var current;
+      try{
+        current = readRates();
+      }catch(err){
+        alert(err.message || String(err));
+        return;
+      }
+      rateRows = current.map(function(r){ return {start:r.start, end:r.end, annual:r.annual_rate}; });
+      var defaultStart = document.getElementById('startDate').value || '2023-03-07';
+      if (rateRows.length > 0){
+        var prev = rateRows[rateRows.length-1];
+        defaultStart = prev.end || prev.start || defaultStart;
+      }
+      rateRows.push({start: defaultStart, end: null, annual:0.08});
       renderRates();
     });
 
     ratesBox.addEventListener('click', function(e){
       var del = e.target && e.target.getAttribute('data-del');
       if (del!==null && del!==undefined){
+        var current;
+        try{
+          current = readRates();
+        }catch(err){
+          alert(err.message || String(err));
+          return;
+        }
+        rateRows = current.map(function(r){ return {start:r.start, end:r.end, annual:r.annual_rate}; });
         var idx = Number(del);
         if (idx>0){ rateRows.splice(idx,1); renderRates(); }
       }
